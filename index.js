@@ -7,6 +7,9 @@ const connectDB = require("./db");
 //mongoose db connection
 connectDB();
 
+//
+const userRoutes = require("./routes/userRoutes");
+
 //.env config
 dotenv.config();
 //rest object
@@ -17,6 +20,8 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
+//routes
+app.use("/api/v1/user", userRoutes);
 //port
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
