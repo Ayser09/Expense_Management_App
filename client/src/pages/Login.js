@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Form, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "../components/layouts/Layout";
 import axios from "axios";
 import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Container from "react-bootstrap/esm/Container";
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  const [error, setError] = useState("");
+  const [error, setError] = useState();
+
   useEffect = () => {};
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log(email, password);
     try {
-      const { data: res } = await axios.post(
-        `http://localhost:8080/api/v1/auth/login`,
-        {
-          email,
-          password,
-        }
+      const { data } = await axios.post(
+        `http://localhost:8080/api/v1/user/login`,
+        { email, password }
       );
-      if (res && res.data.success) {
-        localStorage.setItem("token", res.data);
-      }
+      localStorage.setItem("user", JSON.stringify({ ...data, password: "" }));
+      navigate("/");
     } catch (error) {
       console.log(error);
       if (
@@ -38,7 +37,7 @@ const Login = () => {
   return (
     <>
       <Layout>
-        <div>
+        <Container>
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
@@ -73,7 +72,7 @@ const Login = () => {
               Forgot Password
             </Button>
           </Form>
-        </div>
+        </Container>
       </Layout>
     </>
   );
