@@ -20,7 +20,11 @@ const Register = () => {
       console.log(error);
     }
   };
-  useEffect = () => {};
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      navigate("/");
+    }
+  }, [navigate]);
   return (
     <>
       <Layout>

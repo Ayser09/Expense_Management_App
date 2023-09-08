@@ -11,7 +11,11 @@ const Login = () => {
   const [password, setPassword] = useState();
   const [error, setError] = useState();
 
-  useEffect = () => {};
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      navigate("/");
+    }
+  }, [navigate]);
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log(email, password);
@@ -20,7 +24,10 @@ const Login = () => {
         `http://localhost:8080/api/v1/user/login`,
         { email, password }
       );
-      localStorage.setItem("user", JSON.stringify({ ...data, password: "" }));
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ ...data.user, password: "" })
+      );
       navigate("/");
     } catch (error) {
       console.log(error);
