@@ -9,6 +9,7 @@ connectDB();
 
 //
 const userRoutes = require("./routes/userRoutes");
+const userRoutes = require("./routes/transactionRoutes");
 
 //.env config
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(morgan("dev"));
 
 //routes
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/transactions", transactionRoutes);
 //port
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
