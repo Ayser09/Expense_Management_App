@@ -1,7 +1,7 @@
 const transactionModel = require("../models/transactionModel");
 const getAllTransaction = async (req, res) => {
   try {
-    const transactions = await transactionModel.find({});
+    const transactions = await transactionModel.find({ userid: req.body.user });
     res.status(200).send({
       success: true,
       message: "transaction listed ",
@@ -30,23 +30,6 @@ const addTransaction = async (req, res) => {
       success: false,
       error,
     });
-  }
-};
-const registerController = async (req, res) => {
-  try {
-    const newUser = new userModel(req.body);
-    await newUser.save();
-    res.status(201).json({
-      success: true,
-      message: "user createed successfully",
-      newUser,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({
-      success: false,
-    });
-    error;
   }
 };
 

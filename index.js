@@ -9,7 +9,7 @@ connectDB();
 
 //
 const userRoutes = require("./routes/userRoutes");
-const userRoutes = require("./routes/transactionRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
 
 //.env config
 dotenv.config();
