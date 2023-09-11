@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/layouts/Layout";
 import "../index.css";
 import { Form, Input, Modal, Select, Table, message } from "antd";
-import { UnorderedListOutlined, AreaChartOutlined } from "@ant-design/icons";
+import {
+  UnorderedListOutlined,
+  AreaChartOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import Button from "react-bootstrap/esm/Button";
 import axios from "axios";
 import Spinner from "../components/Spinner";
@@ -18,6 +23,7 @@ const HomePage = () => {
   const [selectedDate, setSelectedDate] = useState([]);
   const [type, setType] = useState("all");
   const [viewData, setViewData] = useState("table");
+  const [editable, setEditable] = useState(null);
 
   // Table columns
   const columns = [
@@ -48,20 +54,48 @@ const HomePage = () => {
     },
     {
       title: "Actions",
+      render: (text, record) => (
+        <div>
+          <EditOutlined
+            onClick={() => {
+              setEditable(record);
+              setShowModal(true);
+            }}
+          />
+          <DeleteOutlined onClick={handleDelete} className="mx-2" />
+        </div>
+      ),
     },
   ];
-
+  // await axios.post(
+  //   `http://localhost:8080/api/v1/transactions/add-transaction`,
+  //   { ...values, userid: user._id }
+  // );
   const handleSubmit = async (values) => {
     try {
       const user = JSON.parse(localStorage.getItem("user")); // Retrieve the user object
       setLoading(true);
-      await axios.post(
-        `http://localhost:8080/api/v1/transactions/add-transaction`,
-        { ...values, userid: user._id }
-      );
+      if (editable) {
+        await axios.post(
+          `http://localhost:8080/api/v1/transactions/edit-transaction`,
+          {
+            paylaod: {
+              ...values,
+              userid: user._id,
+            },
+            transactionId: editable._id,
+          }
+        );
+      } else {
+        await axios.post(
+          `http://localhost:8080/api/v1/transactions/add-transaction`,
+          { ...values, userid: user._id }
+        );
+      }
       setLoading(false);
-      message.success("Transaction added successfully");
+      message.success("Transaction updated successfully");
       setShowModal(false);
+      setEditable(null);
     } catch (error) {
       setLoading(false);
       message.error("Failed to add transaction");
@@ -88,13 +122,26 @@ const HomePage = () => {
     };
     getAllTransactions();
   }, [frequency, selectedDate, type]);
-
+  const handleDelete = async (record) => {
+    try {
+      setLoading(true);
+      await axios.post(
+        `http://localhost:8080/api/v1/transactions/delete-transaction`,
+        { transactionId: record._id }
+      );
+      setLoading(false);
+      message.success("transaction deleted succesfully");
+    } catch (error) {
+      console.log(error);
+      message.error("Failed to delete transactions");
+    }
+  };
   return (
     <>
       <Layout>
         {loading && <Spinner />}
-        <h1>HOMEPAGE</h1>
-        <section className="layout">
+        <h1 className="p-3">HOMEPAGE</h1>
+        <section className="layout p-2">
           <div className="grow1 md-2 p-3">
             <h6>Select Range</h6>
             <Select
@@ -154,12 +201,16 @@ const HomePage = () => {
           </div>
         </section>
         <Modal
-          title="Add Transaction"
+          title={editable ? "edit transaction" : "add transaction"}
           open={showModal}
           onCancel={() => setShowModal(false)}
           footer={null}
         >
-          <Form layout="vertical" onFinish={handleSubmit}>
+          <Form
+            layout="vertical"
+            onFinish={handleSubmit}
+            initialValues={editable}
+          >
             <Form.Item
               label="Amount"
               name="amount"

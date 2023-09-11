@@ -22,14 +22,18 @@ const Header = () => {
     <>
       <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
         <Container>
-          <Navbar.Brand variant="pills" href="#home">
-            React-Bootstrap
+          <Navbar.Brand variant="pills" href="/">
+            EXPENSE MANAGEMENT
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="/login">Login</Nav.Link>
-              <Nav.Link href="/register">Register</Nav.Link>
+              {!loginUser && (
+                <>
+                  <Nav.Link href="/login">Login</Nav.Link>
+                  <Nav.Link href="/register">Register</Nav.Link>
+                </>
+              )}
             </Nav>
             <Nav>
               <Nav.Link>{loginUser && loginUser.name}</Nav.Link>

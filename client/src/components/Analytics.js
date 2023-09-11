@@ -71,7 +71,7 @@ const Analytics = ({ allTransaction }) => {
             </div>
           </div>
         </div>
-        <div className="col-md-4">
+        <div className="col-md-4 p-3">
           <div className="card">
             <div className="card-header">Total TurnOver : {totalTurnover}</div>
             <div className="card-body">
@@ -95,7 +95,7 @@ const Analytics = ({ allTransaction }) => {
           </div>
         </div>
       </div>
-      <div className="row mt-3">
+      <div className="row mt-3 p-3">
         <div className="col-md-4">
           <h4>Categorywise Income</h4>
           {categories.map((category) => {
@@ -122,7 +122,7 @@ const Analytics = ({ allTransaction }) => {
             );
           })}
         </div>
-        <div className="col-md-4">
+        <div className="col-md-4 p-3">
           <h4>Categorywise Expense</h4>
           {categories.map((category) => {
             const amount = allTransaction
