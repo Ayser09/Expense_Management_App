@@ -2,18 +2,29 @@ import React, { useEffect, useState } from "react";
 import Layout from "../components/layouts/Layout";
 import "../index.css";
 import { Form, Input, Modal, Select, Table, message } from "antd";
+import { UnorderedListOutlined, AreaChartOutlined } from "@ant-design/icons";
 import Button from "react-bootstrap/esm/Button";
 import axios from "axios";
+import Spinner from "../components/Spinner";
+import moment from "moment";
+import Analytics from "../components/Analytics";
+const { RangePicker } = "DatePicker";
+
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [allTransaction, setAllTransaction] = useState([]);
+  const [frequency, setFrequency] = useState("7");
+  const [selectedDate, setSelectedDate] = useState([]);
+  const [type, setType] = useState("all");
+  const [viewData, setViewData] = useState("table");
 
-  //table data
+  // Table columns
   const columns = [
     {
       title: "Date",
       dataIndex: "date",
+      render: (text) => <span>{moment(text).format("YYYY-MM-DD")}</span>,
     },
     {
       title: "Amount",
@@ -28,30 +39,17 @@ const HomePage = () => {
       dataIndex: "category",
     },
     {
-      title: "reference",
+      title: "Reference",
       dataIndex: "reference",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
     },
     {
       title: "Actions",
     },
   ];
-
-  const getAllTransaction = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      setLoading(true);
-      const res = await axios.post(
-        `http://localhost:8080/api/v1/transactions/get-transaction`,
-        { userid: user._id }
-      );
-      setLoading(false);
-      setAllTransaction(res.data);
-      console.log(res.data);
-    } catch (error) {
-      message.error("Failed to get query");
-      console.log(error);
-    }
-  };
 
   const handleSubmit = async (values) => {
     try {
@@ -66,73 +64,147 @@ const HomePage = () => {
       setShowModal(false);
     } catch (error) {
       setLoading(false);
-      message.error("Failed to add query");
-      console.log(error);
+      message.error("Failed to add transaction");
+      console.error(error);
     }
   };
+
   useEffect(() => {
-    getAllTransaction();
-  }, []);
+    const getAllTransactions = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        setLoading(true);
+        const res = await axios.post(
+          `http://localhost:8080/api/v1/transactions/get-transaction`,
+          { userid: user._id, frequency, selectedDate, type }
+        );
+        setLoading(false);
+        setAllTransaction(res.data);
+        console.log("Data received:", res.data); // Add this line
+      } catch (error) {
+        message.error("Failed to get transactions");
+        console.error(error);
+      }
+    };
+    getAllTransactions();
+  }, [frequency, selectedDate, type]);
+
   return (
     <>
       <Layout>
-        {loading}
+        {loading && <Spinner />}
         <h1>HOMEPAGE</h1>
-        <section class="layout">
-          <div class="grow1 md-2 p-3">range filter</div>
-          <div class="grow1 md-2 p-3">
-            <Button onClick={() => setShowModal(true)}>add new</Button>{" "}
+        <section className="layout">
+          <div className="grow1 md-2 p-3">
+            <h6>Select Range</h6>
+            <Select
+              value={frequency}
+              onChange={(values) => setFrequency(values)}
+            >
+              <Select.Option value="7">1 week</Select.Option>
+              <Select.Option value="30">1 month</Select.Option>
+              <Select.Option value="365">1 year</Select.Option>
+              <Select.Option value="custom"> customs</Select.Option>
+            </Select>
+            {frequency === "custom" && (
+              <RangePicker
+                value={selectedDate}
+                onChange={(values) => setSelectedDate(values)}
+              />
+            )}
+          </div>
+          <div className="grow1 md-2 p-3">
+            <h6>Select Type</h6>
+            <Select value={type} onChange={(values) => setType(values)}>
+              <Select.Option value="all">ALL</Select.Option>
+              <Select.Option value="income">INCOME</Select.Option>
+              <Select.Option value="expense">EXPENSE</Select.Option>
+            </Select>
+            {/* {type === "all" && (
+              <RangePicker
+                value={selectedDate}
+                onChange={(values) => setSelectedDate(values)}
+              />
+            )} */}
+          </div>
+          <div className="grow1 md-2 p-3">
+            <h6>Select Chart</h6>
+            <UnorderedListOutlined
+              className={`me-2 ${viewData === "table"}`}
+              onClick={() => setViewData("table")}
+            />
+            📊
+            <AreaChartOutlined
+              className={`me-2 ${viewData === "analytics"}`}
+              onClick={() => setViewData("analytics")}
+            />
+            📑
+          </div>
+          <div className="grow1 md-2 p-3">
+            <Button onClick={() => setShowModal(true)}>Add New</Button>
           </div>
         </section>
-        <section class="layout1">
-          <div class="sidebar">Content</div>
-          <div class="body">
-            <Table
-              columns={columns}
-              dataSource={Array.isArray(allTransaction) ? allTransaction : []}
-            />
+        <section className="layout1">
+          <div className="body">
+            {viewData === "table" ? (
+              <Table columns={columns} dataSource={allTransaction} />
+            ) : (
+              <Analytics allTransaction={allTransaction} />
+            )}
           </div>
         </section>
         <Modal
-          title="add transaction"
+          title="Add Transaction"
           open={showModal}
           onCancel={() => setShowModal(false)}
-          footer={false}
+          footer={null}
         >
           <Form layout="vertical" onFinish={handleSubmit}>
-            <Form.Item label="amount " name="amount">
+            <Form.Item
+              label="Amount"
+              name="amount"
+              rules={[{ required: true }]}
+            >
               <Input type="text" />
             </Form.Item>
-            <Form.Item label="type " name="type">
+            <Form.Item label="Type" name="type" rules={[{ required: true }]}>
               <Select>
                 <Select.Option value="income">Income</Select.Option>
-                <Select.Option value="expense"> Expense</Select.Option>
+                <Select.Option value="expense">Expense</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item label="category " name="category">
+            <Form.Item
+              label="Category"
+              name="category"
+              rules={[{ required: true }]}
+            >
               <Select>
-                <Select.Option value="income">
-                  add according to whatevr inc source
-                </Select.Option>
-                <Select.Option value="expense"> spending</Select.Option>
-                <Select.Option value="expense"> food</Select.Option>
-                <Select.Option value="expense"> tax</Select.Option>
-                <Select.Option value="expense"> meds</Select.Option>
-                <Select.Option value="expense"> emi</Select.Option>
-                <Select.Option value="expense"> etc</Select.Option>
+                <Select.Option value="salary">Salary</Select.Option>
+                <Select.Option value="tip">Tip</Select.Option>
+                <Select.Option value="project">Project</Select.Option>
+                <Select.Option value="food">Food</Select.Option>
+                <Select.Option value="movie">Movie</Select.Option>
+                <Select.Option value="bills">Bills</Select.Option>
+                <Select.Option value="medical">Medical</Select.Option>
+                <Select.Option value="fee">Fee</Select.Option>
+                <Select.Option value="tax">TAX</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item label="description " name="description">
-              <Input type="text" />
-            </Form.Item>
-            <Form.Item label="ref " name="reference">
-              <Input type="text" />
-            </Form.Item>
-            <Form.Item label=" date" name="date">
+            <Form.Item label="Date" name="date" rules={[{ required: true }]}>
               <Input type="date" />
             </Form.Item>
+            <Form.Item label="Reference" name="reference">
+              <Input type="text" />
+            </Form.Item>
+            <Form.Item
+              label="Description"
+              name="description"
+              rules={[{ required: true }]}
+            >
+              <Input type="text" />
+            </Form.Item>
             <Button variant="info" type="submit">
-              save
+              Save
             </Button>
           </Form>
         </Modal>
