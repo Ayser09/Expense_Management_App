@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 
 const Footer = () => {
-  const gradientColors = ["#A06CD5", "#6247AA"];
+  const gradientColors = ["#A06CD5", "#E2CFEA"];
   const gradient = `linear-gradient(to right, ${gradientColors.join(", ")})`;
 
   return (
     <div
       className="footer"
       style={{
-        background: gradient,
+        background: gradient, // Set the background to the gradient
         padding: "20px",
         textAlign: "center",
-        color: "white", // Set text color for better visibility
+        color: "white",
       }}
     >
       <h1 className="text-center">All Right Reserved &copy; Expense Mgmt</h1>

@@ -25,3 +25,22 @@
 .body {
   grid-area: body;
 }
+.analytics-container {
+  border: 1px solid #8b8bae; /* Border color */
+  padding: 10px; /* Add padding for spacing */
+  margin: 10px 0; /* Add margin for spacing */
+}
+/* Define the animation keyframes */
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* Apply the animation to the homepage */
+.slide-in {
+  animation: slideInFromLeft 1s ease-in-out;
+}

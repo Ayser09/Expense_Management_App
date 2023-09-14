@@ -24,7 +24,10 @@ const HomePage = () => {
   const [type, setType] = useState("all");
   const [viewData, setViewData] = useState("table");
   const [editable, setEditable] = useState(null);
-
+  const [isAnimated, setIsAnimated] = useState(false);
+  const headerStyle = {
+    background: `linear-gradient(90deg,#7f00ff, #00ff8f )`, // Gradient colors
+  };
   // Table columns
   const columns = [
     {
@@ -136,11 +139,16 @@ const HomePage = () => {
       message.error("Failed to delete transactions");
     }
   };
+  useEffect(() => {
+    setIsAnimated(true); // Trigger the animation when the component has mounted
+  }, []);
   return (
     <>
       <Layout>
         {loading && <Spinner />}
-        <h1 className="p-3">HOMEPAGE</h1>
+        <h1 className={`text-center ${isAnimated ? "slide-in" : ""}`}>
+          HOMEPAGE
+        </h1>
         <section className="layout p-2">
           <div className="grow1 md-2 p-3">
             <h6>Select Range</h6>
@@ -192,7 +200,7 @@ const HomePage = () => {
           </div>
         </section>
         <section className="layout1">
-          <div className="body">
+          <div className="body analytics-container">
             {viewData === "table" ? (
               <Table columns={columns} dataSource={allTransaction} />
             ) : (
@@ -200,11 +208,13 @@ const HomePage = () => {
             )}
           </div>
         </section>
+        {/* MODAL */}
         <Modal
           title={editable ? "edit transaction" : "add transaction"}
           open={showModal}
           onCancel={() => setShowModal(false)}
           footer={null}
+          style={headerStyle}
         >
           <Form
             layout="vertical"

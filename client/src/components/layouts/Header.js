@@ -8,19 +8,31 @@ import { useNavigate } from "react-router-dom";
 const Header = () => {
   const [loginUser, setLoginUser] = useState("");
   const navigate = useNavigate();
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       setLoginUser(user);
     }
   }, []);
+
   const logoutHandler = () => {
     localStorage.removeItem("user");
     navigate("/login");
   };
+
+  const headerStyle = {
+    background: `linear-gradient(90deg ,#A06CD5,#00ddff )`,
+  };
+
   return (
     <>
-      <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
+      <Navbar
+        collapseOnSelect
+        expand="lg"
+        className="bg-body-tertiary"
+        style={headerStyle} // Apply the gradient background style
+      >
         <Container>
           <Navbar.Brand variant="pills" href="/">
             EXPENSE MANAGEMENT
@@ -37,9 +49,15 @@ const Header = () => {
             </Nav>
             <Nav>
               <Nav.Link>{loginUser && loginUser.name}</Nav.Link>
-              <Button onClick={logoutHandler} eventKey={2}>
-                Logout
-              </Button>
+              {loginUser && (
+                <Button
+                  onClick={logoutHandler}
+                  eventKey={2}
+                  style={{ background: "transparent", border: "none" }}
+                >
+                  Logout
+                </Button>
+              )}
             </Nav>
           </Navbar.Collapse>
         </Container>
