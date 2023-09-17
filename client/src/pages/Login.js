@@ -20,10 +20,10 @@ const Login = () => {
     event.preventDefault();
     console.log(email, password);
     try {
-      const { data } = await axios.post(
-        `http://localhost:8080/api/v1/user/login`,
-        { email, password }
-      );
+      const { data } = await axios.post(`/api/v1/user/login`, {
+        email,
+        password,
+      });
       localStorage.setItem(
         "user",
         JSON.stringify({ ...data.user, password: "" })
